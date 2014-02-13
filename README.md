@@ -7,7 +7,7 @@
 
 ### How to use :
 - Download the .tns file
-- Transfer it to your TI-Nspire (any OS >= 3.2 - a 3.1 version is possible, though, just use luna on the Lua source code.)
+- Transfer it to your TI-Nspire (any OS >= 3.1)
 - Open the document and enjoy :)
 
 ### Notes :
