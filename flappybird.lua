@@ -20,8 +20,8 @@ local sprites = {
 	ground = image.new("\007\000\000\000\007\000\000\000\000\000\000\000\014\000\000\000\016\000\001\000\200\168\200\168\200\168\200\168\200\168\200\168\200\168\241\243\241\243\241\243\241\243\241\243\241\243\241\243\171\207\171\207\005\187\005\187\005\187\005\187\171\207\171\207\005\187\005\187\005\187\005\187\171\207\171\207\005\187\005\187\005\187\005\187\171\207\171\207\171\207\004\170\004\170\004\170\004\170\004\170\004\170\004\170\169\234\169\234\169\234\169\234\169\234\169\234\169\234")
 }
 
-local t_period = platform.hw and (platform.hw()== 7 and 0.02 or 0.01) or 0.01
-local frameskip = platform.hw and (platform.hw()== 7 and 1 or 3) or 3
+local t_period = platform.hw and (platform.hw() == 7 and 0.02 or 0.01) or 0.01
+local frameskip = platform.hw and (platform.hw() == 7 and 1 or 3) or 3
 local showImages = true
 local window = platform.window
 local the_highscore = 0
@@ -40,6 +40,7 @@ function timer.start(ms)
 	end
 	timer.isRunning = true
 end
+
 local tstop = timer.stop
 function timer.stop()
 	timer.isRunning = false
@@ -78,26 +79,27 @@ local nilfunc = function() end
 local unimplemented = function(name) debugPrint("Unimplemented method : " .. name) return nilfunc end
 
 class = function(prototype)
-	local derived={}
+	local derived = {}
 	if prototype then
-		function derived.__index(t,key)
-			return rawget(derived,key) or prototype[key] or unimplemented(key)
+		function derived.__index(t, key)
+			return rawget(derived, key) or prototype[key] or unimplemented(key)
 		end
 	else
-		function derived.__index(t,key)
-			return rawget(derived,key) or unimplemented(key)
+		function derived.__index(t, key)
+			return rawget(derived, key) or unimplemented(key)
 		end
 	end
-	function derived.__call(proto,...)
-		local instance={}
-		setmetatable(instance,proto)
-		local init=instance.init
+	function derived.__call(proto, ...)
+		local instance = {}
+		setmetatable(instance, proto)
+		local init = instance.init
 		if init then
-			init(instance,...)
+			init(instance, ...)
 		end
 		return instance
 	end
-	setmetatable(derived,derived)
+
+	setmetatable(derived, derived)
 	return derived
 end
 
@@ -127,6 +129,7 @@ if (platform.registerErrorHandler) then
 		print("Error handled ! ", errMsg)
 		return true -- let the script continue
 	end
+
 	platform.registerErrorHandler(myErrorHandler)
 end
 
@@ -134,31 +137,30 @@ end
 --------------------------------------
 ---------    GC Extensions    --------
 --------------------------------------
-
 local function drawCenteredRect(gc, w, h)
-	gc:drawRect((platform.window:width()-w) / 2, (platform.window:height()-h) / 2, w, h)
+	gc:drawRect((platform.window:width() - w) / 2, (platform.window:height() - h) / 2, w, h)
 end
 
 local function fillCenteredRect(gc, w, h)
-	gc:fillRect((platform.window:width()-w) / 2, (platform.window:height()-h) / 2, w, h)
+	gc:fillRect((platform.window:width() - w) / 2, (platform.window:height() - h) / 2, w, h)
 end
 
 local function drawCenteredString(gc, str)
-	gc:drawString(str, (platform.window:width()-gc:getStringWidth(str)) / 2, platform.window:height() / 2, "middle")
+	gc:drawString(str, (platform.window:width() - gc:getStringWidth(str)) / 2, platform.window:height() / 2, "middle")
 end
 
 local function drawXCenteredString(gc, str, y)
-	gc:drawString(str, (platform.window:width()-gc:getStringWidth(str)) / 2, y, "top")
+	gc:drawString(str, (platform.window:width() - gc:getStringWidth(str)) / 2, y, "top")
 end
 
 local function setTitleFont(gc)
-	gc:setColorRGB(0,0,0)
-	gc:setFont("serif", "b", platform.window:width()/25)
+	gc:setColorRGB(0, 0, 0)
+	gc:setFont("serif", "b", platform.window:width() / 25)
 end
 
 local function setNormalFont(gc)
-	gc:setColorRGB(0,0,0)
-	gc:setFont("serif", "r", platform.window:width()/30)
+	gc:setColorRGB(0, 0, 0)
+	gc:setFont("serif", "r", platform.window:width() / 30)
 end
 
 AddToGC("drawCenteredRect", drawCenteredRect)
@@ -184,7 +186,7 @@ function RemoveScreen(screen)
 	table.remove(screens, screenLocation[screen])
 	screenLocation[screen] = nil
 	currentScreen = #screens
-	if #screens<=0 then debugPrint("Uh oh. This shouldn't have happened ! You must have removed too many screens.") end
+	if #screens <= 0 then debugPrint("Uh oh. This shouldn't have happened ! You must have removed too many screens.") end
 	collectgarbage()
 end
 
@@ -210,7 +212,9 @@ end
 Screen = class()
 
 function Screen:init() end
+
 function Screen:pushed() end
+
 function Screen:removed() end
 
 function Screen:replaceBy(newScreen)
@@ -225,7 +229,7 @@ RootScreen = Screen() -- dummy screen.
 local eventCatcher = {}
 local triggeredEvent = "paint"
 
-local eventDistributer = function (...)
+local eventDistributer = function(...)
 	if (triggeredEvent == 'paint' or triggeredEvent == 'timer') then -- stacking
 		for _, currentScreen in pairs(screens) do
 			currentScreen[triggeredEvent](currentScreen, ...)
@@ -238,7 +242,7 @@ local eventDistributer = function (...)
 	end
 end
 
-eventCatcher.__index = function (tbl, event)
+eventCatcher.__index = function(tbl, event)
 	triggeredEvent = event
 	return eventDistributer
 end
@@ -276,12 +280,12 @@ end
 Bird = class()
 
 function Bird:init()
-	self.x = .15*pww
-	self.y = .4*pwh
+	self.x = .15 * pww
+	self.y = .4 * pwh
 end
 
 function Bird:paint(gc)
-	gc:drawImage(sprites.bird, self.x-8, self.y-8)
+	gc:drawImage(sprites.bird, self.x - 8, self.y - 8)
 end
 
 function Bird:move(delta)
@@ -293,46 +297,46 @@ end
 Tube = class()
 
 function Tube:init()
-	self.x = .85*pww
+	self.x = .85 * pww
 	self.w = 30
-	self.holeSize = math.random(.17*pwh, .20*pwh)
-	self.holeY = math.random(.1*pwh, .6*pwh)
+	self.holeSize = math.random(.17 * pwh, .20 * pwh)
+	self.holeY = math.random(.1 * pwh, .6 * pwh)
 end
 
 function Tube:paint(gc)
 	gc:setColorRGB(118, 194, 44)
 	gc:fillRect(self.x, 0, self.w, self.holeY)
-	gc:fillRect(self.x, self.holeY+self.holeSize, self.w, pwh) -- we don't care about the height
-	
+	gc:fillRect(self.x, self.holeY + self.holeSize, self.w, pwh) -- we don't care about the height
+
 	gc:setColorRGB(138, 225, 64)
-	gc:fillRect(self.x+4, 0, 2, self.holeY)
-	
+	gc:fillRect(self.x + 4, 0, 2, self.holeY)
+
 	gc:setColorRGB(0, 0, 0)
 	gc:drawRect(self.x, -1, self.w, self.holeY)
-	gc:drawRect(self.x, self.holeY+self.holeSize, self.w, pwh)
-	
-    gc:setColorRGB(138, 225, 64)
-	gc:fillRect(self.x+4, self.holeY+self.holeSize, 2, pwh)
+	gc:drawRect(self.x, self.holeY + self.holeSize, self.w, pwh)
+
+	gc:setColorRGB(138, 225, 64)
+	gc:fillRect(self.x + 4, self.holeY + self.holeSize, 2, pwh)
 
 	gc:setColorRGB(118, 194, 44)
-	gc:fillRect(self.x-8, self.holeY-16, self.w+16, 16)
-	gc:fillRect(self.x-8, self.holeY+self.holeSize, self.w+16, 16)
+	gc:fillRect(self.x - 8, self.holeY - 16, self.w + 16, 16)
+	gc:fillRect(self.x - 8, self.holeY + self.holeSize, self.w + 16, 16)
 
-    gc:setColorRGB(138, 225, 64)
-	gc:fillRect(self.x-4, self.holeY+self.holeSize, 2, 16)
-	gc:fillRect(self.x-4, self.holeY-16, 2, 16)
+	gc:setColorRGB(138, 225, 64)
+	gc:fillRect(self.x - 4, self.holeY + self.holeSize, 2, 16)
+	gc:fillRect(self.x - 4, self.holeY - 16, 2, 16)
 
 	gc:setColorRGB(0, 0, 0)
-	gc:drawRect(self.x-8, self.holeY-16, self.w+16, 16)
-	gc:drawRect(self.x-8, self.holeY+self.holeSize, self.w+16, 16)
+	gc:drawRect(self.x - 8, self.holeY - 16, self.w + 16, 16)
+	gc:drawRect(self.x - 8, self.holeY + self.holeSize, self.w + 16, 16)
 end
 
 function Tube:scroll()
-	self.x = self.x - 2*frameskip
+	self.x = self.x - 2 * frameskip
 end
 
 function Tube:checkCollisionWith(bird)
-    return (not ( bird.y > self.holeY and bird.y < self.holeY+self.holeSize) )
+	return (not (bird.y > self.holeY and bird.y < self.holeY + self.holeSize))
 end
 
 
@@ -366,45 +370,45 @@ end
 
 function GameScreen:paint(gc)
 	gc:setColorRGB(123, 197, 205)
-	gc:fillRect(0, 0, pww, .9*pwh)
+	gc:fillRect(0, 0, pww, .9 * pwh)
 	gc:setColorRGB(137, 225, 139)
-	gc:fillRect(0, .7*pwh+2, pww, .9*pwh)
-	
+	gc:fillRect(0, .7 * pwh + 2, pww, .9 * pwh)
+
 	if showImages then
-        for i=0, pww, 34 do
-    	    gc:drawImage(sprites.horizon, i, .7*pwh+2)
-        end
-    end
-    
+		for i = 0, pww, 34 do
+			gc:drawImage(sprites.horizon, i, .7 * pwh + 2)
+		end
+	end
+
 	gc:setColorRGB(219, 218, 150)
-	gc:fillRect(0, .9*pwh, pww, .9*pwh)
-	
+	gc:fillRect(0, .9 * pwh, pww, .9 * pwh)
+
 	if showImages then
-        for i=0, pww, 7 do
-            gc:drawImage(sprites.ground, i, .9*pwh-2)
-        end
-    end
-    
-	for i,tube in ipairs(self.tubes) do
+		for i = 0, pww, 7 do
+			gc:drawImage(sprites.ground, i, .9 * pwh - 2)
+		end
+	end
+
+	for i, tube in ipairs(self.tubes) do
 		tube:paint(gc)
 	end
 
 	self.bird:paint(gc)
 
 	gc:setTitleFont()
-	if (not self.started or self.gameOver) then gc:drawXCenteredString(self.statusText,.4*pwh) end
+	if (not self.started or self.gameOver) then gc:drawXCenteredString(self.statusText, .4 * pwh) end
 	gc:setNormalFont()
 	if (self.started) then
-		gc:drawXCenteredString("Score : " .. tostring(self.score) .. ((self.score > 0 and the_highscore==self.score) and " (Highscore !)" or ""), .03*pwh)
+		gc:drawXCenteredString("Score : " .. tostring(self.score) .. ((self.score > 0 and the_highscore == self.score) and " (Highscore !)" or ""), .03 * pwh)
 	else
-		gc:drawXCenteredString("Highscore : " .. tostring(the_highscore), .03*pwh)
+		gc:drawXCenteredString("Highscore : " .. tostring(the_highscore), .03 * pwh)
 	end
-	if (self.started and self.pause) then gc:drawXCenteredString("-- PAUSE --", .9*pwh) end
+	if (self.started and self.pause) then gc:drawXCenteredString("-- PAUSE --", .9 * pwh) end
 end
 
 function GameScreen:enterKey()
 	if (not self.started) then
-	    if self.gameOver then self:pushed() end
+		if self.gameOver then self:pushed() end
 		timer.start(t_period)
 		self.started = true
 	end
@@ -412,11 +416,11 @@ function GameScreen:enterKey()
 end
 
 function GameScreen:charIn(ch)
-	if ch=="p" and self.started then
+	if ch == "p" and self.started then
 		self.pause = not self.pause
-	elseif ch=="i" then
-	    showImages = not showImages
-	elseif ch=="h" then
+	elseif ch == "i" then
+		showImages = not showImages
+	elseif ch == "h" then
 		self.pause = true
 		PushScreen(AboutScreen)
 	end
@@ -424,7 +428,7 @@ function GameScreen:charIn(ch)
 end
 
 function GameScreen:help()
-    self:charIn("h")
+	self:charIn("h")
 end
 
 function GameScreen:tabKey()
@@ -445,32 +449,32 @@ function GameScreen:timer()
 		if (self.bird.y < 2) then
 			self.bird.y = 2
 		end
-		self.bird:move((self.hasPressedTab and (timeNow-self.lastAction < 100)) and -2.5*frameskip or 2.5*frameskip)
+		self.bird:move((self.hasPressedTab and (timeNow - self.lastAction < 100)) and -2.5 * frameskip or 2.5 * frameskip)
 
-        if (self.tubes[#self.tubes].x < .7*pwh and math.random(1,4)==1) then
+		if (self.tubes[#self.tubes].x < .7 * pwh and math.random(1, 4) == 1) then
 			table.insert(self.tubes, Tube())
 		end
-		
-		if self.tubes[1].x < -50 then
-            self.score = self.score + 1
-            table.remove(self.tubes, 1)
-        end
 
-		for i,tube in ipairs(self.tubes) do
+		if self.tubes[1].x < -50 then
+			self.score = self.score + 1
+			table.remove(self.tubes, 1)
+		end
+
+		for i, tube in ipairs(self.tubes) do
 			tube:scroll()
-            if (self.bird.y>.9*pwh-6 or i==1 and self.bird.x >= tube.x-8 and self.bird.x <= tube.x+tube.w+8 and tube:checkCollisionWith(self.bird)) then
-                timer.stop()
-                self.gameOver = true
-                self.started = false
-            end
-        end
-                
+			if (self.bird.y > .9 * pwh - 6 or i == 1 and self.bird.x >= tube.x - 8 and self.bird.x <= tube.x + tube.w + 8 and tube:checkCollisionWith(self.bird)) then
+				timer.stop()
+				self.gameOver = true
+				self.started = false
+			end
+		end
+
 		if (self.score > the_highscore) then
 			the_highscore = self.score
 			document.markChanged()
 		end
 
-		if (timeNow-self.lastAction > 100) then
+		if (timeNow - self.lastAction > 100) then
 			self.hasPressedTab = false
 		end
 
@@ -500,36 +504,37 @@ end
 
 function AboutScreen:paint(gc)
 	gc:setColorRGB(220, 235, 230)
-	gc:fillCenteredRect(.62*pww, .68*pwh)
+	gc:fillCenteredRect(.62 * pww, .68 * pwh)
 	gc:setColorRGB(0, 0, 0)
-	gc:drawCenteredRect(.62*pww, .68*pwh)
+	gc:drawCenteredRect(.62 * pww, .68 * pwh)
 	gc:setColorRGB(75, 75, 75)
-	gc:drawCenteredRect(.62*pww-2, .68*pwh-2)
+	gc:drawCenteredRect(.62 * pww - 2, .68 * pwh - 2)
 	gc:setColorRGB(150, 150, 150)
-	gc:drawCenteredRect(.62*pww-4, .68*pwh-4)
+	gc:drawCenteredRect(.62 * pww - 4, .68 * pwh - 4)
 	gc:setColorRGB(0, 0, 0)
-	gc:setFont("serif", "b", pww/30)
-	gc:drawImage(sprites.logo, .5*pww-sprites.logo:width()/2, .24*pwh-sprites.logo:height()/2)
-	gc:drawXCenteredString("TI-Nspire Lua", .28*pwh)
-	gc:setFont("serif", "i", pww/35)
-	gc:drawXCenteredString("Original game by .GEARS", .38*pwh)
-	gc:setFont("serif", "r", pww/35)
-	gc:drawXCenteredString("(C) 2014 Adriweb - tiplanet.org", .445*pwh)
-	gc:drawXCenteredString("Start/Stop : [Enter]/[Esc]", .56*pwh-4)
-	gc:drawXCenteredString("Fly up : [tab]", .62*pwh-3)
-	gc:drawXCenteredString("(un)Pause : [p]", .68*pwh-2)
-	gc:drawXCenteredString("Help/About : [h]", .74*pwh)
+	gc:setFont("serif", "b", pww / 30)
+	gc:drawImage(sprites.logo, .5 * pww - sprites.logo:width() / 2, .24 * pwh - sprites.logo:height() / 2)
+	gc:drawXCenteredString("TI-Nspire Lua", .28 * pwh)
+	gc:setFont("serif", "i", pww / 35)
+	gc:drawXCenteredString("Original game by .GEARS", .38 * pwh)
+	gc:setFont("serif", "r", pww / 35)
+	gc:drawXCenteredString("(C) 2014 Adriweb - tiplanet.org", .445 * pwh)
+	gc:drawXCenteredString("Start/Stop : [Enter]/[Esc]", .56 * pwh - 4)
+	gc:drawXCenteredString("Fly up : [tab]", .62 * pwh - 3)
+	gc:drawXCenteredString("(un)Pause : [p]", .68 * pwh - 2)
+	gc:drawXCenteredString("Help/About : [h]", .74 * pwh)
 end
 
 function AboutScreen:escapeKey()
 	RemoveScreen(self)
 	window:invalidate()
 end
+
 AboutScreen.enterKey = AboutScreen.escapeKey
 AboutScreen.help = AboutScreen.escapeKey
 
 function AboutScreen:charIn(ch)
-	if ch=='h' then
+	if ch == 'h' then
 		self:escapeKey()
 	end
 end
