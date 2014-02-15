@@ -11,4 +11,5 @@
 - Open the document and enjoy :)
 
 ### Notes :
-More information about Lua programming on the TI-Nspire : [Inspired-Lua](http://www.inspired-lua.org) and TI Calculators in general : [TI-Planet.org](http://tiplanet.org)
+- More information about Lua programming on the TI-Nspire : [Inspired-Lua](http://www.inspired-lua.org) and TI Calculators in general : [TI-Planet.org](http://tiplanet.org)
+- I did a live-streaming of the programming of the game. You can find the video here : https://www.youtube.com/watch?v=em2SiG2zGDM&hd=1
